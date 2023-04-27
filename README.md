@@ -14,13 +14,20 @@ Leaderboard Game School est un site web conçu avec Django et MongoDB qui permet
 - [x] Créer une page d'authentifcation d'Utilisateur
 - [x] Créer des Catégories de Jeux
 
-
 ## Installation 🌱
 
 Pour faire fonctionner l'application, vous devrez installer les bibliothèques nécessaires listées dans le fichier requirements.txt. Vous pouvez les installer en utilisant pip:
 
 ```python
 pip install -r requirements.txt
+```
+
+## Usage
+
+Pour lancer l'application, utilisez la commande suivante:
+
+```cmd
+python app.py
 ```
 
 ## Démo 🖥️
@@ -207,3 +214,7 @@ L'application permet aux utilisateurs de s'inscrire et de se connecter à leur c
 ## Architecture de l'application 🔍
 
 L'application est construite à l'aide de Flask, un framework web léger pour Python. Elle utilise MongoDB pour le stockage des données et Flask-Login pour l'authentification des utilisateurs. L'application est conçue pour être facilement extensible, avec la possibilité d'ajouter de nouveaux jeux et de nouvelles fonctionnalités en fonction des besoins. Le code est bien organisé et commenté pour faciliter la maintenance et les développements futurs.
+
+## Auteur 🚀
+
+[@Foufou-exe](https://github.com/Foufou-exe)
