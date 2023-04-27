@@ -29,9 +29,7 @@ jobs:
 
     - name: Start Flask app locally
       run: |
-        export FLASK_APP=app.py
-        export FLASK_ENV=development
-        flask run
+        python app.py
 
     - name: Deploy to Render
       run: |
