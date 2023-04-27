@@ -8,16 +8,24 @@
 
 Leaderboard Game School est un site web conçu avec Django et MongoDB qui permet d'afficher les classements des joueurs en fonction de leurs performances dans différents jeux. Les statistiques des joueurs sont également affichées, permettant aux utilisateurs de comparer leurs performances avec celles des autres joueurs. Les jeux proposés peuvent varier selon les préférences de l'administrateur du site, et les joueurs peuvent s'inscrire pour participer au concours.  Leaderboard Game School est conçu pour offrir une expérience de jeu compétitive et amusante aux joueurs de tous niveaux.
 
-## Tache 👍
+## Tâches 👍
 
-- [ ] Afficher le classement des joueurs ainsi que leurs statisques
-- [ ] Créer une page d'authentifcation d'Utilisateur
-- [ ] Créer des Catégories de Jeux
-- [ ] Réagir au Classements des personnes
+- [x] Afficher le classement des joueurs ainsi que leurs statisques
+- [x] Créer une page d'authentifcation d'Utilisateur
+- [x] Créer des Catégories de Jeux
+
+
+## Installation 🌱
+
+Pour faire fonctionner l'application, vous devrez installer les bibliothèques nécessaires listées dans le fichier requirements.txt. Vous pouvez les installer en utilisant pip:
+
+```python
+pip install -r requirements.txt
+```
 
 ## Démo 🖥️
 
-_Bientôt..._
+![demo](.github/demo.gif)
 
 ## Code ⚙️
 
@@ -31,10 +39,12 @@ _Bientôt..._
 ### Frameworks
 
 - Flask
+- Tailwind
 
 ### Services
 
 - MongoDB
+- Flask
 
 ### Structure SQL 🎈
 ##### MCD
@@ -53,55 +63,40 @@ Petit exemple de la structure en SQL
 <details>
 
 ```sql
-CREATE TABLE Utilisateur(
+CREATE TABLE _User(
    id_user INT,
-   scoreTotal INT NOT NULL,
-   Finalposition INT NOT NULL,
-   PRIMARY KEY(id_user),
-   UNIQUE(scoreTotal),
-   UNIQUE(Finalposition)
-);
-
-CREATE TABLE Partie(
-   id_partie INT,
-   partie INT NOT NULL,
-   _date DATE NOT NULL,
-   _position INT NOT NULL,
-   name VARCHAR(255) NOT NULL,
-   score BIGINT NOT NULL,
-   PRIMARY KEY(id_partie),
-   UNIQUE(partie),
-   UNIQUE(_date),
-   UNIQUE(_position),
-   UNIQUE(name),
-   UNIQUE(score)
-);
-
-CREATE TABLE Connexion(
-   id_connexion INT,
    username VARCHAR(255) NOT NULL,
    password VARCHAR(255) NOT NULL,
    email VARCHAR(255) NOT NULL,
-   PRIMARY KEY(id_connexion),
+   PRIMARY KEY(id_user),
    UNIQUE(username),
    UNIQUE(password),
    UNIQUE(email)
 );
 
-CREATE TABLE UtilisateurJouePartie(
-   id_user INT,
-   id_partie INT,
-   PRIMARY KEY(id_user, id_partie),
-   FOREIGN KEY(id_user) REFERENCES Utilisateur(id_user),
-   FOREIGN KEY(id_partie) REFERENCES Partie(id_partie)
+CREATE TABLE Jeux(
+   id_jeux VARCHAR(50),
+   name VARCHAR(255) NOT NULL,
+   PRIMARY KEY(id_jeux),
+   UNIQUE(name)
 );
 
-CREATE TABLE ConnexionAppartient(
+CREATE TABLE Partie(
+   id_partie INT,
+   _date DATE NOT NULL,
+   id_jeux VARCHAR(50) NOT NULL,
+   PRIMARY KEY(id_partie),
+   UNIQUE(_date),
+   FOREIGN KEY(id_jeux) REFERENCES Jeux(id_jeux)
+);
+
+CREATE TABLE User_Partie(
+   id_partie INT,
    id_user INT,
-   id_connexion INT,
-   PRIMARY KEY(id_user, id_connexion),
-   FOREIGN KEY(id_user) REFERENCES Utilisateur(id_user),
-   FOREIGN KEY(id_connexion) REFERENCES Connexion(id_connexion)
+   score INT,
+   PRIMARY KEY(id_partie, id_user),
+   FOREIGN KEY(id_partie) REFERENCES Partie(id_partie),
+   FOREIGN KEY(id_user) REFERENCES _User(id_user)
 );
 
 
@@ -116,56 +111,99 @@ Petit exemple de la structure en NoSQL
 <details>
 
 ```NoSQL
-Utilisateur :
-{
-id_user: INTEGER,
-scoreTotal: INTEGER,
-Finalposition: INTEGER
-}
+db.createCollection("_User", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["username", "password", "email"],
+         properties: {
+            id_user: {
+               bsonType: "objectId"
+            },
+            username: {
+               bsonType: "string"
+            },
+            password: {
+               bsonType: "string"
+            },
+            email: {
+               bsonType: "string"
+            }
+         },
+         uniqueItems: ["username", "password", "email"]
+      }
+   }
+})
 
-Partie :
-{
-id_partie: INTEGER,
-partie: INTEGER,
-date: DATE,
-position: INTEGER,
-name: STRING,
-score: BIGINT
-}
+db.createCollection("Jeux", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["name"],
+         properties: {
+            id_jeux: {
+               bsonType: "objectId"
+            },
+            name: {
+               bsonType: "string"
+            }
+         },
+         uniqueItems: ["name"]
+      }
+   }
+})
 
-Connexion :
-{
-id_connexion: INTEGER,
-username: STRING,
-password: STRING,
-email: STRING
-}
+db.createCollection("Partie", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["_date", "id_jeux"],
+         properties: {
+            id_partie: {
+               bsonType: "objectId"
+            },
+            _date: {
+               bsonType: "date"
+            },
+            id_jeux: {
+               bsonType: "objectId",
+               ref: "Jeux"
+            }
+         },
+         uniqueItems: ["_date"]
+      }
+   }
+})
 
-UtilisateurJouePartie :
-{
-id_user: INTEGER,
-parties: [
-{
-id_partie: INTEGER,
-score: BIGINT,
-position: INTEGER,
-date: DATE
-}
-]
-}
-
-ConnexionAppartient :
-{
-id_user: INTEGER,
-connexions: [
-{
-id_connexion: INTEGER,
-username: STRING,
-password: STRING,
-email: STRING
-}
-]
-}
+db.createCollection("User_Partie", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["id_partie", "id_user", "score"],
+         properties: {
+            id_partie: {
+               bsonType: "objectId",
+               ref: "Partie"
+            },
+            id_user: {
+               bsonType: "objectId",
+               ref: "_User"
+            },
+            score: {
+               bsonType: "int"
+            }
+         }
+      }
+   }
+})
 ```
 
 </details>
+
+## Fonctionnalités 📖
+
+L'application permet aux utilisateurs de s'inscrire et de se connecter à leur compte. Une fois connectés, les utilisateurs peuvent consulter le classement des différents jeux et enregistrer leurs scores pour chaque jeu. L'application fournit également des statistiques de jeu pour chaque utilisateur, indiquant le nombre de victoires et de défaites pour chaque jeu.
+
+## Architecture de l'application 🔍
+
+L'application est construite à l'aide de Flask, un framework web léger pour Python. Elle utilise MongoDB pour le stockage des données et Flask-Login pour l'authentification des utilisateurs. L'application est conçue pour être facilement extensible, avec la possibilité d'ajouter de nouveaux jeux et de nouvelles fonctionnalités en fonction des besoins. Le code est bien organisé et commenté pour faciliter la maintenance et les développements futurs.
