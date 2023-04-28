@@ -1,3 +1,49 @@
+"""
+Auteur: Foufou-exe
+
+Le module contient une application web Flask avec les fonctionnalités suivantes :
+
+   - connexion
+   - inscription
+   - réinitialisation de mot de passe
+   - tableau de bord
+   - gestion des scores de jeu
+    Les différentes bibliothèques importées sont :
+
+   - bson pour manipuler les identifiants ObjectId de MongoDB
+   - Flask pour créer l'application web
+   - flask_login pour gérer la connexion/déconnexion des utilisateurs
+   - pymongo pour manipuler la base de données MongoDB
+   - os pour accéder aux variables d'environnement et gérer les chemins de fichiers
+   - logging pour gérer les messages de log
+   - datetime pour manipuler les dates
+   - uuid pour générer des identifiants uniques
+    Les variables MONGODB_PASSWORD, MONGODB_USER et SECRET_KEY sont définies à partir des variables d'environnement.
+
+    La fonction load_user() est un gestionnaire d'utilisateur pour Flask-Login qui charge un utilisateur à partir de la base de données MongoDB.
+
+    L'application contient les routes suivantes :
+
+    - "/" : redirige vers la page de connexion
+    - "/register" : gère l'inscription d'un nouvel utilisateur
+    - "/login" : gère la connexion d'un utilisateur existant
+    - "/reset_password" : gère la réinitialisation du mot de passe d'un utilisateur
+    - "/logout" : déconnecte l'utilisateur actuel
+    - "/dashboard" : affiche le tableau de bord de l'utilisateur
+    - "/api/scores" : renvoie les scores pour un jeu donné au format JSON
+    - "/api/add_game" : ajoute un nouveau jeu à la base de données
+    - "/api/add_score" : ajoute un nouveau score à la base de données
+    - "/api/game_stats" : renvoie les statistiques de jeu pour l'utilisateur actuel au format JSON
+    
+    La fonction get_scores() récupère les scores pour un jeu donné à partir de la base de données.
+
+    La fonction get_game_stats() récupère les statistiques de jeu pour l'utilisateur actuel à partir de la base de données.
+
+    La fonction inject_cache_buster() ajoute une chaîne aléatoire à l'URL pour éviter le caching des fichiers statiques.
+
+    Si le script est exécuté directement, l'application est lancée sur le port 80.
+"""
+
 # LIB APP
 from bson import ObjectId
 from flask import Flask, jsonify, make_response
@@ -32,7 +78,7 @@ log_filename = "app-" + datetime.now().strftime("%Y-%m-%d") + ".log"
 chemin_python = os.path.abspath(__file__)
 repertoire_travail = os.path.dirname(chemin_python)
 log = os.path.join(repertoire_travail, f"logs/{log_filename}")
-# Configuration du logger
+
 log_formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 handler = logging.handlers.RotatingFileHandler(
     log,
@@ -82,9 +128,9 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method != "POST":
-        # If GET request, show registration form
+        
         return render_template("register.html")
-    # Get user data from form
+    
     username = request.form["username"]
     email = request.form["email"]
     password = request.form["password"]
@@ -96,26 +142,26 @@ def register():
         flash("A user with that username or email already exists", "error")
         return redirect(url_for("register"))
 
-    # Check if passwords match
+    
     if password != confirm_password:
         flash("Passwords do not match", "error")
         app.logger.error(f"Passwords do not match for user {username}")
         return redirect(url_for("register"))
 
-    # Hash password
+    
     hashed_password = generate_password_hash(password)
 
-    # Create new user object
+    
     user_data = {"username": username, "email": email, "password": hashed_password}
     result = users.insert_one(user_data)
-    # Convert ObjectId to string
+    
     user_id = str(result.inserted_id)
 
-    # Create new user object
+    
     user = User(user_id, username, email, password)
     login_user(user)
 
-    # Redirect to dashboard
+   
     app.logger.info(f"New user registered: {username}")
     return redirect(url_for("dashboard"))
 
@@ -146,16 +192,16 @@ def login():
 @app.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
     if request.method == "POST":
-        # Get user data from form
+        
         username = request.form["username"]
         email = request.form["email"]
         new_password = request.form["new_password"]
         confirm_password = request.form["confirm_password"]
 
-        # Check if user exists and the provided email matches the user's email
+        
         user = users.find_one({"username": username})
         if user and user["email"] == email:
-            # Check if new password matches the confirm password
+           
             if new_password != confirm_password:
                 app.logger.error(
                     f"User {username} tried to reset password with wrong confirmation"
@@ -179,7 +225,7 @@ def reset_password():
             flash({"type": "error", "message": "Nom d'utilisateur ou e-mail invalide."})
             return redirect(url_for("reset_password"))
 
-    # If GET request, show forgot password form
+    
     return render_template("reset_password.html")
 
 
@@ -249,7 +295,7 @@ def get_scores(game_id):
 
     sorted_scores = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
 
-    # Check if game is Uno and reverse the order of sorting
+
     if str(game_id) == "644a6c68fb7f12aafa1c195d":
         sorted_scores.reverse()
 
