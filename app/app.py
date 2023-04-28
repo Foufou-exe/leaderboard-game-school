@@ -60,7 +60,8 @@ login_manager.login_view = "login"
 
 @login_manager.user_loader
 def load_user(user_id):
-    if user_data := users.find_one({"_id": ObjectId(user_id)}):
+    user_data = users.find_one({"_id": ObjectId(user_id)})
+    if user_data:
         return User(
             str(user_data["_id"]),
             user_data["username"],
@@ -69,6 +70,7 @@ def load_user(user_id):
         )
     else:
         return None
+
 
 
 @app.route("/")
@@ -87,9 +89,8 @@ def register():
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
 
-    if existing_user := users.find_one(
-        {"$or": [{"username": username}, {"email": email}]}
-    ):
+    existing_user = users.find_one({"$or": [{"username": username}, {"email": email}]})
+    if existing_user:
         app.logger.error(f"User {username} already exists or email already used")
         flash("A user with that username or email already exists", "error")
         return redirect(url_for("register"))
@@ -240,7 +241,8 @@ def get_scores(game_id):
         for user_partie in user_parties:
             user_id = user_partie["id_user"]
             if str(user_id) not in scores:
-                if user := user_collection.find_one({"_id": ObjectId(user_id)}):
+                user = user_collection.find_one({"_id": ObjectId(user_id)})
+                if user:
                     scores[str(user_id)] = {"username": user["username"], "score": 0}
             scores[str(user_id)]["score"] += user_partie["score"]
 
@@ -339,12 +341,13 @@ def get_game_stats():
 
         parties = partie_collection.find({"id_jeux": ObjectId(game_id)})
         for partie in parties:
-            if user_partie := user_partie_collection.find_one(
+            user_partie = user_partie_collection.find_one(
                 {
                     "id_partie": ObjectId(partie["_id"]),
                     "id_user": ObjectId(current_user.id),
                 }
-            ):
+            )
+            if user_partie:
                 if user_partie["score"] > 0:
                     total_wins += 1
                 else:
