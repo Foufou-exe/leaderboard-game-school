@@ -1,2 +1,2 @@
-from .app import app
-from .models import User
+from .models import *
+from .app import *
