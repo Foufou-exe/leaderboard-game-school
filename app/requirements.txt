@@ -1,6 +1,5 @@
 Flask
 Flask-Login
 pymongo
-bson
 gunicorn
 flask_testing
