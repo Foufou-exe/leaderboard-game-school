@@ -6,6 +6,11 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      CI: true
+      MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
+      MONGODB_USER: ${{ secrets.MONGODB_USER }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
     strategy:
       matrix:
         python-version: ["3.9", "3.10","3.11"]
