@@ -3,4 +3,4 @@ Flask-Login
 pymongo
 gunicorn
 flask_testing
-dotenv
+# dotenv

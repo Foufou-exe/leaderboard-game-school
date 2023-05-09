@@ -62,9 +62,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 import uuid
-import dotenv
+# import dotenv
 
-dotenv.load_dotenv()
+# dotenv.load_dotenv()
 
 
 MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD")
