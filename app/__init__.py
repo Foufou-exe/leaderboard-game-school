@@ -1,3 +1,3 @@
 """Auteur: Foufou-exe"""
-from .models import *
-from .app import *
+from .models import User
+from .app import app

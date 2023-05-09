@@ -62,13 +62,14 @@ import logging
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 import uuid
+import dotenv
 
+dotenv.load_dotenv()
 
 
 MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD")
 MONGODB_USER = os.environ.get("MONGODB_USER")
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
 
 
 app = Flask(__name__)
@@ -119,7 +120,6 @@ def load_user(user_id):
         return None
 
 
-
 @app.route("/")
 def index():
     return redirect(url_for("login"))
@@ -128,9 +128,9 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method != "POST":
-        
+
         return render_template("register.html")
-    
+
     username = request.form["username"]
     email = request.form["email"]
     password = request.form["password"]
@@ -142,26 +142,21 @@ def register():
         flash("A user with that username or email already exists", "error")
         return redirect(url_for("register"))
 
-    
     if password != confirm_password:
         flash("Passwords do not match", "error")
         app.logger.error(f"Passwords do not match for user {username}")
         return redirect(url_for("register"))
 
-    
     hashed_password = generate_password_hash(password)
 
-    
     user_data = {"username": username, "email": email, "password": hashed_password}
     result = users.insert_one(user_data)
-    
+
     user_id = str(result.inserted_id)
 
-    
     user = User(user_id, username, email, password)
     login_user(user)
 
-   
     app.logger.info(f"New user registered: {username}")
     return redirect(url_for("dashboard"))
 
@@ -192,16 +187,15 @@ def login():
 @app.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
     if request.method == "POST":
-        
+
         username = request.form["username"]
         email = request.form["email"]
         new_password = request.form["new_password"]
         confirm_password = request.form["confirm_password"]
 
-        
         user = users.find_one({"username": username})
         if user and user["email"] == email:
-           
+
             if new_password != confirm_password:
                 app.logger.error(
                     f"User {username} tried to reset password with wrong confirmation"
@@ -225,7 +219,6 @@ def reset_password():
             flash({"type": "error", "message": "Nom d'utilisateur ou e-mail invalide."})
             return redirect(url_for("reset_password"))
 
-    
     return render_template("reset_password.html")
 
 
@@ -294,7 +287,6 @@ def get_scores(game_id):
             scores[str(user_id)]["score"] += user_partie["score"]
 
     sorted_scores = sorted(scores.values(), key=lambda x: x["score"], reverse=True)
-
 
     if str(game_id) == "644a6c68fb7f12aafa1c195d":
         sorted_scores.reverse()
