@@ -54,14 +54,12 @@ python app.py
 - Flask
 
 ### Structure SQL 🎈
+
 ##### MCD
 
 ![mcd](MCD/mcd.png)
 
 #### Création BDD
-
-
-
 
 ##### Script SQL
 
