@@ -34,6 +34,25 @@ python app.py
 
 ![demo](.github/demo.gif)
 
+
+## Screen 👨‍💻
+
+__Page Login__
+
+![demo](.github/connexion.png)
+
+__Page Register__
+
+![demo](.github/inscription.png)
+
+__Page Reset Password__
+
+![demo](.github/reset.png)
+
+__Page Dashboard__
+
+![demo](.github/dashboard.png)
+
 ## Code ⚙️
 
 ### Langages 📖
@@ -215,4 +234,9 @@ L'application est construite à l'aide de Flask, un framework web léger pour Py
 
 ## Auteur 🚀
 
+_Commit effectuée avec mon compte @Foufou-exe_ (travaille effectuée sur __LiveShare__)
+
 [@Foufou-exe](https://github.com/Foufou-exe)
+[@mathislef34](https://github.com/mathislef34)
+[@nicolasLlinares](https://github.com/nicolasLlinares)
+[@thorbeorn](https://github.com/thorbeorn)
